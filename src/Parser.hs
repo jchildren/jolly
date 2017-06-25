@@ -38,12 +38,13 @@ rws :: [String]
 rws = ["True", "False"]
 
 identifier :: Parser Name
-identifier = (lexeme .try) (p >>= check)
-    where
-        p       = (:) <$> letterChar <*> many alphaNumChar
-        check x = if x `elem` rws
-                     then fail $ "keyword " ++ show x ++ " cannot be an identifier"
-                    else return x
+identifier = (lexeme . try) (p >>= check)
+  where
+    p = (:) <$> letterChar <*> many alphaNumChar
+    check x =
+      if x `elem` rws
+        then fail $ "keyword " ++ show x ++ " cannot be an identifier"
+        else return x
 
 parseExpr :: Parser Expr
 parseExpr = between sc eof expr
@@ -53,25 +54,25 @@ expr = makeExprParser term operators
 
 operators :: [[Operator Parser Expr]]
 operators =
-  [[InfixL (Op Mul <$ symbol "*")], [InfixL (Op Add <$ symbol "+")], [InfixL (Op Sub <$ symbol "-")], [InfixL (Op Eql <$ symbol "==")]]
+  [ [InfixL (Op Mul <$ symbol "*")]
+  , [InfixL (Op Add <$ symbol "+")]
+  , [InfixL (Op Sub <$ symbol "-")]
+  , [InfixL (Op Eql <$ symbol "==")]
+  ]
 
 lambda :: Parser Expr
 lambda = do
-    symbol "\\"
-    arg <- identifier
-    symbol "->"
-    body <- expr
-    return $ Lam arg body
+  symbol "\\"
+  arg <- identifier
+  symbol "->"
+  body <- expr
+  return $ Lam arg body
 
 term :: Parser Expr
-term = aexp >>= \x ->
-                (some aexp >>= \xs -> return (foldl App x xs))
-                <|> return x
+term =
+  aexp >>= \x -> (some aexp >>= \xs -> return (foldl App x xs)) <|> return x
 
 aexp :: Parser Expr
 aexp =
-  parens expr
-    <|> Var <$> identifier
-   <|> lambda
-   <|> Lit . LInt <$> integer
-   <|> Lit . LBool <$> boolean
+  parens expr <|> Var <$> identifier <|> lambda <|> Lit . LInt <$> integer <|>
+  Lit . LBool <$> boolean

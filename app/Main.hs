@@ -3,10 +3,10 @@ module Main where
 import           System.Console.Haskeline
 import           Text.Megaparsec
 
+import           Eval
 import           Parser
 import           Pretty
 import           Syntax
-import           Eval
 
 process :: String -> String
 process line = do

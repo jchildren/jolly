@@ -26,19 +26,19 @@ emptyEnv = empty
 eval :: Env -> Expr -> Value
 eval env term =
   case term of
-    Var n         -> env ! n
+    Var n -> env ! n
     Lam n a -> VClosure n a env
-    App a b -> 
+    App a b ->
       let VClosure n c env' = eval env a
       in let v = eval env b
-          in eval (insert n v env') c
-    Lit (LInt n)  -> VInt n
+         in eval (insert n v env') c
+    Lit (LInt n) -> VInt n
     Lit (LBool n) -> VBool n
-    Op p a b      -> evalPrim p (eval env a) (eval env b)
+    Op p a b -> evalPrim p (eval env a) (eval env b)
 
 evalPrim :: BinOp -> Value -> Value -> Value
-evalPrim Add (VInt a) (VInt b) = VInt (a + b)
-evalPrim Mul (VInt a) (VInt b) = VInt (a * b)
-evalPrim Sub (VInt a) (VInt b) = VInt (a - b)
-evalPrim Eql (VInt a) (VInt b) = VBool (a == b)
+evalPrim Add (VInt a) (VInt b)   = VInt (a + b)
+evalPrim Mul (VInt a) (VInt b)   = VInt (a * b)
+evalPrim Sub (VInt a) (VInt b)   = VInt (a - b)
+evalPrim Eql (VInt a) (VInt b)   = VBool (a == b)
 evalPrim Eql (VBool a) (VBool b) = VBool (a == b)
