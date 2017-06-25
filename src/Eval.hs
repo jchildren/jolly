@@ -13,7 +13,8 @@ import           Syntax
 data Value
   = VInt Integer
   | VBool Bool
-  | VClosure Expr
+  | VClosure Name
+             Expr
              Env
   deriving (Show)
 
@@ -26,13 +27,11 @@ eval :: Env -> Expr -> Value
 eval env term =
   case term of
     Var n         -> env ! n
-{-
-    Lam n a -> VClosure a env
-    App a b ->
-      let VClosure c env' = eval env a
+    Lam n a -> VClosure n a env
+    App a b -> 
+      let VClosure n c env' = eval env a
       in let v = eval env b
-         in eval (v : env') c
--}
+          in eval (insert n v env') c
     Lit (LInt n)  -> VInt n
     Lit (LBool n) -> VBool n
     Op p a b      -> evalPrim p (eval env a) (eval env b)
@@ -42,3 +41,4 @@ evalPrim Add (VInt a) (VInt b) = VInt (a + b)
 evalPrim Mul (VInt a) (VInt b) = VInt (a * b)
 evalPrim Sub (VInt a) (VInt b) = VInt (a - b)
 evalPrim Eql (VInt a) (VInt b) = VBool (a == b)
+evalPrim Eql (VBool a) (VBool b) = VBool (a == b)

@@ -29,13 +29,13 @@ integer :: Parser Integer
 integer = lexeme L.integer
 
 boolean :: Parser Bool
-boolean = True <$ string "True" <|> False <$ string "False"
+boolean = True <$ reserved "True" <|> False <$ reserved "False"
 
 reserved :: String -> Parser ()
 reserved w = string w *> notFollowedBy alphaNumChar *> sc
 
 rws :: [String]
-rws = ["let", "if", "then", "else", "where"]
+rws = ["True", "False"]
 
 identifier :: Parser Name
 identifier = (lexeme .try) (p >>= check)
@@ -55,10 +55,23 @@ operators :: [[Operator Parser Expr]]
 operators =
   [[InfixL (Op Mul <$ symbol "*")], [InfixL (Op Add <$ symbol "+")], [InfixL (Op Sub <$ symbol "-")], [InfixL (Op Eql <$ symbol "==")]]
 
+lambda :: Parser Expr
+lambda = do
+    symbol "\\"
+    arg <- identifier
+    symbol "->"
+    body <- expr
+    return $ Lam arg body
+
 term :: Parser Expr
-term =
+term = aexp >>= \x ->
+                (some aexp >>= \xs -> return (foldl App x xs))
+                <|> return x
+
+aexp :: Parser Expr
+aexp =
   parens expr
     <|> Var <$> identifier
-   <|> Lam <$> identifier <*> term
+   <|> lambda
    <|> Lit . LInt <$> integer
    <|> Lit . LBool <$> boolean
