@@ -18,27 +18,39 @@ parensIf False = id
 instance Pretty Expr where
   ppr p e =
     case e of
-      Lit a   -> text (show a)
-      Var x   -> text (show x)
+      Lit (LInt a) -> text (show a)
+      Lit (LBool a) -> text (show a)
+      Var x   -> text x
       App a b -> parensIf (p > 0) $ ppr (p + 1) a <+> ppr p b
       Lam x a -> parensIf (p>0) $
                 char '\\'
             <>  text x
             <+> text "->"
             <+> ppr p a
+    
+      Op sym a b -> ppr p a <+> showSym sym <+> ppr p b
 
 instance Pretty Value where
-  ppr p e =
-    case e of
+    ppr p e = case e of
       VInt a       -> text (show a)
       VBool a      -> text (show a)
       VClosure x a env  -> char '\\'
                         <> text x
                         <+> text "->"
-                        <+> ppr p a <> showEnv env
+                        <+> ppr p a
+                        <+> showEnv env
 
 showEnv :: Env -> Doc
-showEnv e = braces (hsep (fmap pp (elems e)))
+showEnv e =
+    let ppentry (k, a) = text k <+> char '=' <+> pp a in
+        braces (hsep (fmap ppentry (assocs e)))
+
+
+showSym :: BinOp -> Doc
+showSym Add = char '+'
+showSym Sub = char '-'
+showSym Mul = char '*'
+showSym Eql = text "=="
 
 ppexpr :: Expr -> String
 ppexpr = render . ppr 0
