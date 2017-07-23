@@ -8,18 +8,29 @@ license: MIT
 github: jchildren/jolly
 extra-source-files:
 - README.md
+dependencies:
+  - text
 library:
   source-dirs: src
   exposed-modules:
-  - Syntax
-  - Parser
-  - Eval
-  - Pretty
+  - Jolly
+  other-modules:
+  - Jolly.Eval
+  - Jolly.Parser
+  - Jolly.Pretty
+  - Jolly.Syntax
+  - Jolly.Syntax.Types
+  - Jolly.Types
+  - Jolly.Types.Env
+  - Jolly.Types.Infer
+  - Jolly.Types.System
   dependencies:
   - base >=4.7 && <5
   - megaparsec
   - containers
   - pretty
+  - transformers
+  - mtl
 executables:
   jolly-exe:
     main: Main.hs
@@ -31,8 +42,9 @@ executables:
     dependencies:
     - base
     - jolly
-    - megaparsec
-    - haskeline
+    - repline
+    - containers
+    - mtl
 tests:
   jolly-test:
     main: Spec.hs

@@ -1,14 +1,17 @@
-module Parser
-  ( parseExpr
+module Jolly.Parser
+  ( runParseExpr
+  , runParseModule
   ) where
 
-import           Control.Monad          (void)
+import           Control.Monad             (void)
+import           Data.Functor.Identity
+import qualified Data.Text.Lazy            as LT
 import           Text.Megaparsec
 import           Text.Megaparsec.Expr
-import qualified Text.Megaparsec.Lexer  as L
-import           Text.Megaparsec.String
+import qualified Text.Megaparsec.Lexer     as L
+import           Text.Megaparsec.Text.Lazy
 
-import           Syntax
+import           Jolly.Syntax
 
 sc :: Parser ()
 sc = L.space (void spaceChar) lineCmnt blockCmnt
@@ -35,7 +38,7 @@ reserved :: String -> Parser ()
 reserved w = string w *> notFollowedBy alphaNumChar *> sc
 
 rws :: [String]
-rws = ["True", "False"]
+rws = ["True", "False", "let"]
 
 identifier :: Parser Name
 identifier = (lexeme . try) (p >>= check)
@@ -76,3 +79,51 @@ aexp :: Parser Expr
 aexp =
   parens expr <|> Var <$> identifier <|> lambda <|> Lit . LInt <$> integer <|>
   Lit . LBool <$> boolean
+
+type Binding = (String, Expr)
+
+signature :: Parser (Name, [Name], Expr)
+signature = do
+  name <- identifier
+  args <- many identifier
+  symbol "="
+  body <- expr
+  return (name, args, body)
+
+letdecl :: Parser Binding
+letdecl = do
+  reserved "let"
+  (name, args, body) <- signature
+  return (name, foldr Lam body args)
+
+letrecdecl :: Parser Binding
+letrecdecl = do
+  reserved "let"
+  reserved "rec"
+  (name, args, body) <- signature
+  return (name, Fix $ foldr Lam body (name : args))
+
+val :: Parser Binding
+val = do
+  ex <- expr
+  return ("it", ex)
+
+decl :: Parser Binding
+decl = try letrecdecl <|> letdecl <|> val
+
+top :: Parser Binding
+top = do
+  x <- decl
+  optional (symbol ";")
+  return x
+
+modl :: Parser [Binding]
+modl = many top
+
+runParseExpr ::
+     String -> LT.Text -> Either (ParseError (Token LT.Text) Dec) Expr
+runParseExpr = runParser parseExpr
+
+runParseModule ::
+     String -> LT.Text -> Either (ParseError (Token LT.Text) Dec) [Binding]
+runParseModule = runParser modl

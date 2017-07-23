@@ -26,17 +26,25 @@ library
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      text
+    , base >=4.7 && <5
     , megaparsec
     , containers
     , pretty
+    , transformers
+    , mtl
   exposed-modules:
-      Syntax
-      Parser
-      Eval
-      Pretty
+      Jolly
   other-modules:
-      Paths_jolly
+      Jolly.Eval
+      Jolly.Parser
+      Jolly.Pretty
+      Jolly.Syntax
+      Jolly.Syntax.Types
+      Jolly.Types
+      Jolly.Types.Env
+      Jolly.Types.Infer
+      Jolly.Types.System
   default-language: Haskell2010
 
 executable jolly-exe
@@ -45,10 +53,12 @@ executable jolly-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base
+      text
+    , base
     , jolly
-    , megaparsec
-    , haskeline
+    , repline
+    , containers
+    , mtl
   default-language: Haskell2010
 
 test-suite jolly-test
@@ -58,6 +68,7 @@ test-suite jolly-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base
+      text
+    , base
     , jolly
   default-language: Haskell2010

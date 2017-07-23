@@ -1,8 +1,10 @@
-module Syntax
+module Jolly.Syntax.Types
   ( Name
   , Expr(..)
   , BinOp(..)
   , Lit(..)
+  , Program(..)
+  , Decl
   ) where
 
 type Name = String
@@ -13,7 +15,14 @@ data Expr
         Expr
   | App Expr
         Expr
+  | Let Name
+        Expr
+        Expr
   | Lit Lit
+  | If Expr
+       Expr
+       Expr
+  | Fix Expr
   | Op BinOp
        Expr
        Expr
@@ -30,3 +39,10 @@ data Lit
   = LInt Integer
   | LBool Bool
   deriving (Show, Eq, Ord)
+
+data Program =
+  Program [Decl]
+          Expr
+  deriving (Eq)
+
+type Decl = (String, Expr)
