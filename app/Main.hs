@@ -65,20 +65,20 @@ cmd source = exec True (L.pack source)
 evalDef :: TermEnv -> (String, Expr) -> TermEnv
 evalDef env (nm, ex) = tmctx'
   where
-    (val, tmctx') = runEval env nm ex
+    (_, tmctx') = runEval env nm ex
 
 exec :: Bool -> L.Text -> Repl ()
 exec update source = do
   st <- get
-  mod <- hoistParseErr source $ runParseModule "<stdin>" source
-  typectx' <- hoistErr $ inferTop (typectx st) mod
+  modl <- hoistParseErr source $ runParseModule "<stdin>" source
+  typectx' <- hoistErr $ inferTop (typectx st) modl
   let st' =
         st
-        { termctx = foldl' evalDef (termctx st) mod
+        { termctx = foldl' evalDef (termctx st) modl
         , typectx = typectx' <> typectx st
         }
   when update (put st')
-  case lookup "it" mod of
+  case lookup "it" modl of
     Nothing -> return ()
     Just ex -> do
       let (val, _) = runEval (termctx st') "it" ex

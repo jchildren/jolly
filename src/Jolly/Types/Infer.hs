@@ -4,7 +4,7 @@
 
 module Jolly.Types.Infer
   ( inferTop
-  , Constraint(..)
+  , Constraint
   , Subst(..)
   , TypeError(..)
   ) where
@@ -171,7 +171,6 @@ infer expr =
       return (tv, c1 ++ c2 ++ [(t1, t2 `TArr` tv)])
     Let x e1 e2 -> do
       (t1, c1) <- infer e1
-      (t2, c2) <- infer e2
       env <- ask
       case runSolve c1 of
         Left err -> throwError err

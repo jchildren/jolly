@@ -4,11 +4,7 @@ module Jolly.Parser
   ( runParseModule
   ) where
 
-import           Control.Monad              (void)
-import           Data.Functor.Identity
-import           Data.Proxy
 import qualified Data.Text.Lazy             as TL
-import           Data.Void
 import           Text.Megaparsec
 import           Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L

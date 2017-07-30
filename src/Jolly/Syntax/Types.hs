@@ -7,8 +7,6 @@ module Jolly.Syntax.Types
   , Decl
   ) where
 
-import Text.Megaparsec.Error
-
 type Name = String
 
 data Expr
