@@ -12,7 +12,7 @@ import qualified Data.Map.Strict        as Map
 import           Jolly.Syntax
 
 data Value
-  = VInt Integer
+  = VInt Int
   | VBool Bool
   | VClosure String
              Expr
@@ -55,7 +55,7 @@ eval env expr =
         else eval env fl
     Fix e -> eval env (App e (Fix e))
 
-binop :: BinOp -> Integer -> Integer -> Value
+binop :: BinOp -> Int -> Int -> Value
 binop Add a b = VInt $ a + b
 binop Mul a b = VInt $ a * b
 binop Sub a b = VInt $ a - b

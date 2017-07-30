@@ -7,7 +7,6 @@ module Jolly
   , inferTop
   , ppenv
   , ppsignature
-  , runParseExpr
   , runParseModule
   , runEval
   , Expr(..)

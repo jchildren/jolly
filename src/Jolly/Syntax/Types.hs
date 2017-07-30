@@ -26,7 +26,7 @@ data Expr
   | Op BinOp
        Expr
        Expr
-  deriving (Eq, Show)
+  deriving (Eq, Show, Ord)
 
 data BinOp
   = Add
@@ -36,7 +36,7 @@ data BinOp
   deriving (Eq, Ord, Show)
 
 data Lit
-  = LInt Integer
+  = LInt Int
   | LBool Bool
   deriving (Show, Eq, Ord)
 

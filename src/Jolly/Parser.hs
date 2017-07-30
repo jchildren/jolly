@@ -1,45 +1,63 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Jolly.Parser
-  ( runParseExpr
-  , runParseModule
+  ( runParseModule
   ) where
 
-import           Control.Monad             (void)
+import           Control.Monad              (void)
 import           Data.Functor.Identity
-import qualified Data.Text.Lazy            as LT
+import           Data.Proxy
+import qualified Data.Text.Lazy             as TL
+import           Data.Void
 import           Text.Megaparsec
+import           Text.Megaparsec.Char
+import qualified Text.Megaparsec.Char.Lexer as L
 import           Text.Megaparsec.Expr
-import qualified Text.Megaparsec.Lexer     as L
-import           Text.Megaparsec.Text.Lazy
 
 import           Jolly.Syntax
 
+type Parser = Parsec Decl TL.Text
+
+-- Lexer helpers
+{-# INLINE sc #-}
 sc :: Parser ()
-sc = L.space (void spaceChar) lineCmnt blockCmnt
+sc = L.space space1 lineCmnt blockCmnt
   where
     lineCmnt = L.skipLineComment "--"
     blockCmnt = L.skipBlockComment "{-" "-}"
 
+{-# INLINE lexeme #-}
 lexeme :: Parser a -> Parser a
 lexeme = L.lexeme sc
 
-symbol :: String -> Parser String
+{-# INLINE symbol #-}
+symbol :: TL.Text -> Parser TL.Text
 symbol = L.symbol sc
 
+-- Combinators
+{-# INLINE parens #-}
 parens :: Parser a -> Parser a
 parens = between (symbol "(") (symbol ")")
 
-integer :: Parser Integer
-integer = lexeme L.integer
+-- Primative data types
+{-# INLINE integer #-}
+integer :: Parser Int
+integer = lexeme L.decimal
 
+{-# INLINE boolean #-}
 boolean :: Parser Bool
 boolean = True <$ reserved "True" <|> False <$ reserved "False"
 
-reserved :: String -> Parser ()
+-- Reserved tokens and identifiers
+{-# INLINE reserved #-}
+reserved :: TL.Text -> Parser ()
 reserved w = string w *> notFollowedBy alphaNumChar *> sc
 
+{-# INLINE rws #-}
 rws :: [String]
 rws = ["True", "False", "let"]
 
+{-# INLINE identifier #-}
 identifier :: Parser Name
 identifier = (lexeme . try) (p >>= check)
   where
@@ -49,9 +67,7 @@ identifier = (lexeme . try) (p >>= check)
         then fail $ "keyword " ++ show x ++ " cannot be an identifier"
         else return x
 
-parseExpr :: Parser Expr
-parseExpr = between sc eof expr
-
+-- Expressions
 expr :: Parser Expr
 expr = makeExprParser term operators
 
@@ -120,10 +136,6 @@ top = do
 modl :: Parser [Binding]
 modl = many top
 
-runParseExpr ::
-     String -> LT.Text -> Either (ParseError (Token LT.Text) Dec) Expr
-runParseExpr = runParser parseExpr
-
 runParseModule ::
-     String -> LT.Text -> Either (ParseError (Token LT.Text) Dec) [Binding]
+     String -> TL.Text -> Either (ParseError (Token TL.Text) Decl) [Binding]
 runParseModule = runParser modl

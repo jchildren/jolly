@@ -26,7 +26,7 @@ library:
   - Jolly.Types.System
   dependencies:
   - base >=4.7 && <5
-  - megaparsec
+  - megaparsec >=6 && <7
   - containers
   - pretty
   - transformers

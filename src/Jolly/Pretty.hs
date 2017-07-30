@@ -65,7 +65,7 @@ instance Pretty Expr where
     text "if" <> ppr p a <+> text "then" <+> ppr p b <+> text "else" <+> ppr p c
 
 instance Pretty Lit where
-  ppr _ (LInt i)      = integer i
+  ppr _ (LInt i)      = int i
   ppr _ (LBool True)  = text "True"
   ppr _ (LBool False) = text "False"
 
