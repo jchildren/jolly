@@ -1,10 +1,5 @@
 module Jolly.Syntax
-  ( Name
-  , Expr(..)
-  , BinOp(..)
-  , Lit(..)
-  , Program(..)
-  , Decl
+  ( module Jolly.Syntax.Types
   ) where
 
 import           Jolly.Syntax.Types

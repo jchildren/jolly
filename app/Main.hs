@@ -16,6 +16,8 @@ import           Data.Monoid
 import qualified Data.Text.Lazy             as L
 import qualified Data.Text.Lazy.IO          as L
 
+import           Text.Megaparsec
+
 import           Jolly
 
 data IState = IState
@@ -33,6 +35,16 @@ hoistErr (Right val) = return val
 hoistErr (Left err) = do
   liftIO $ print err
   abort
+
+hoistParseErr :: (ShowErrorComponent e) 
+              => L.Text -> Either (ParseError (Token L.Text) e) a -> Repl a
+hoistParseErr _ (Right val) = return val
+hoistParseErr stream (Left err) = do
+  liftIO $ putStr $ parseErrorPretty' stream err
+  abort
+
+instance ShowErrorComponent Decl where
+  showErrorComponent decl = show decl
 
 main :: IO ()
 main = do
@@ -58,7 +70,7 @@ evalDef env (nm, ex) = tmctx'
 exec :: Bool -> L.Text -> Repl ()
 exec update source = do
   st <- get
-  mod <- hoistErr $ runParseModule "<stdin>" source
+  mod <- hoistParseErr source $ runParseModule "<stdin>" source
   typectx' <- hoistErr $ inferTop (typectx st) mod
   let st' =
         st

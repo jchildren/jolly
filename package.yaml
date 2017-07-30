@@ -45,6 +45,7 @@ executables:
     - repline
     - containers
     - mtl
+    - megaparsec >=6 && <7
 tests:
   jolly-test:
     main: Spec.hs

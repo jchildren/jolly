@@ -1,15 +1,9 @@
 module Jolly
-  ( TypeEnv(..)
-  , TermEnv(..)
-  , emptyTypeEnv
-  , lookupType
-  , emptyTermEnv
-  , inferTop
-  , ppenv
-  , ppsignature
-  , runParseModule
-  , runEval
-  , Expr(..)
+  ( module Jolly.Eval
+  , module Jolly.Parser
+  , module Jolly.Pretty
+  , module Jolly.Syntax
+  , module Jolly.Types
   ) where
 
 import           Jolly.Eval
