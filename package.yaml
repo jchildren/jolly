@@ -9,7 +9,11 @@ github: jchildren/jolly
 extra-source-files:
 - README.md
 dependencies:
-  - text
+  - base >=4.7 && <5
+  - text >=1.2 && <1.3
+  - containers >= 0.5 && <0.6
+  - mtl >= 2.2 && < 2.3
+  - megaparsec >=6 && <7
 library:
   source-dirs: src
   exposed-modules:
@@ -25,12 +29,8 @@ library:
   - Jolly.Types.Infer
   - Jolly.Types.System
   dependencies:
-  - base >=4.7 && <5
-  - megaparsec >=6 && <7
-  - containers
   - pretty
   - transformers
-  - mtl
 executables:
   jolly-exe:
     main: Main.hs
@@ -40,12 +40,8 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - base
     - jolly
     - repline
-    - containers
-    - mtl
-    - megaparsec >=6 && <7
 tests:
   jolly-test:
     main: Spec.hs
@@ -55,5 +51,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - base
     - jolly

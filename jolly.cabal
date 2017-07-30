@@ -26,13 +26,13 @@ library
   hs-source-dirs:
       src
   build-depends:
-      text
-    , base >=4.7 && <5
+      base >=4.7 && <5
+    , text >=1.2 && <1.3
+    , containers >= 0.5 && <0.6
+    , mtl >= 2.2 && < 2.3
     , megaparsec >=6 && <7
-    , containers
     , pretty
     , transformers
-    , mtl
   exposed-modules:
       Jolly
   other-modules:
@@ -53,13 +53,13 @@ executable jolly-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      text
-    , base
+      base >=4.7 && <5
+    , text >=1.2 && <1.3
+    , containers >= 0.5 && <0.6
+    , mtl >= 2.2 && < 2.3
+    , megaparsec >=6 && <7
     , jolly
     , repline
-    , containers
-    , mtl
-    , megaparsec >=6 && <7
   default-language: Haskell2010
 
 test-suite jolly-test
@@ -69,7 +69,10 @@ test-suite jolly-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      text
-    , base
+      base >=4.7 && <5
+    , text >=1.2 && <1.3
+    , containers >= 0.5 && <0.6
+    , mtl >= 2.2 && < 2.3
+    , megaparsec >=6 && <7
     , jolly
   default-language: Haskell2010
